@@ -1,0 +1,193 @@
+definitions:
+  driver.NoteInstance:
+    properties:
+      content:
+        type: string
+      title:
+        type: string
+      updated_time:
+        type: string
+    type: object
+  rest.ListCateResponse:
+    properties:
+      data:
+        items:
+          type: string
+        type: array
+      error:
+        type: integer
+      more:
+        type: string
+      msg:
+        type: string
+    type: object
+  rest.ListNoteResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/driver.NoteInstance'
+        type: array
+      error:
+        type: integer
+      more:
+        type: string
+      msg:
+        type: string
+    type: object
+  rest.NewCateRequest:
+    properties:
+      cate:
+        type: string
+    type: object
+  rest.NewCateResponse:
+    properties:
+      error:
+        type: integer
+      more:
+        type: string
+      msg:
+        type: string
+      parameters:
+        $ref: '#/definitions/rest.NewCateRequest'
+    type: object
+  rest.NewNoteRequest:
+    properties:
+      cate:
+        type: string
+      content:
+        type: string
+      title:
+        type: string
+    type: object
+  rest.NewNoteResponse:
+    properties:
+      error:
+        type: integer
+      more:
+        type: string
+      msg:
+        type: string
+      parameters:
+        $ref: '#/definitions/rest.NewNoteRequest'
+    type: object
+  rest.VersionResponse:
+    properties:
+      apiVersion:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /p/{cate}/list-note:
+    get:
+      parameters:
+      - description: Category
+        in: path
+        name: cate
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/rest.ListNoteResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: List notebooks
+      tags:
+      - public apis
+  /p/health:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: k8s health check
+      tags:
+      - public apis
+  /p/list-cate:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/rest.ListCateResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: List notebook categories
+      tags:
+      - public apis
+  /p/new-cate:
+    post:
+      parameters:
+      - description: request parameters, must be fill in
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/rest.NewCateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/rest.NewCateResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: Add a new cate
+      tags:
+      - public apis
+  /p/new-note:
+    post:
+      parameters:
+      - description: request parameters, must be fill in
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/rest.NewNoteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/rest.NewNoteResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: Add a new note
+      tags:
+      - public apis
+  /p/version:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/rest.VersionResponse'
+      summary: Get current api version
+      tags:
+      - public apis
+swagger: "2.0"
