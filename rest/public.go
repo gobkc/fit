@@ -2,8 +2,11 @@ package rest
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/gobkc/fit/conf"
 	"github.com/gobkc/fit/driver"
 	"net/http"
+	"os"
+	"strings"
 )
 
 type Response struct {
@@ -200,4 +203,72 @@ func (s *Server) ListNote(c *gin.Context) {
 			Msg: "OK",
 		}},
 	)
+}
+
+// Push
+//
+//	@Tags		public apis
+//	@Summary	push all notes to email
+//	@Produce	json
+//	@Success	200	{object}	Response	"success"
+//	@Failure	401	{object}	string		"Unauthorized"
+//	@Router		/p/push [post]
+func (s *Server) Push(c *gin.Context) {
+	//bytes := s.d.AddFiles(s.c.JwtSalt)
+	bytes := s.d.AddFiles(``)
+	if err := s.d.SendEmail(s.c.Email.User, `fit`, `fit-update`, bytes); err != nil {
+		s.JSON(c, Response{
+			Error: 1,
+			More:  err.Error(),
+			Msg:   `failed to send email`,
+		})
+		return
+	}
+	s.JSON(c, Response{Msg: `ok`})
+}
+
+// Pull
+//
+//	@Tags		public apis
+//	@Summary	pull fit attachment from email
+//	@Produce	json
+//	@Success	200	{object}	Response	"success"
+//	@Failure	401	{object}	string		"Unauthorized"
+//	@Router		/p/pull [post]
+func (s *Server) Pull(c *gin.Context) {
+	data, err := s.d.GetAttachmentFromEmail()
+	if err != nil {
+		s.JSON(c, Response{
+			Error: 1,
+			More:  err.Error(),
+			Msg:   `failed to send email`,
+		})
+		return
+	}
+	//data, _ := os.ReadFile(`/home/xiong/fit.fit`)
+	//files := s.d.DeCompress(s.c.JwtSalt, data)
+	files := s.d.DeCompress(``, data)
+	cachePath := conf.GetCachePath()
+	if err := os.RemoveAll(cachePath); err != nil {
+		s.JSON(c, Response{
+			Error: 1,
+			More:  err.Error(),
+			Msg:   `failed to remove cache path`,
+		})
+		return
+	}
+	for _, file := range files {
+		cate := strings.ReplaceAll(file.Cate, cachePath, ``)
+		file.Filename = strings.ReplaceAll(file.Filename, `.md`, ``)
+		if err := s.d.NewNote(cate, file.Filename, file.Content); err != nil {
+			s.JSON(c, Response{
+				Error: 1,
+				Msg:   "Failed to create note",
+				More:  err.Error(),
+			})
+			return
+		}
+
+	}
+	s.JSON(c, Response{Msg: `ok`})
 }

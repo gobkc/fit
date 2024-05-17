@@ -12,6 +12,8 @@ func NewDriver() Driver {
 	once.Do(func() {
 		d.c = conf.GetConf()
 		d.NoteDriver = NewNote()
+		d.CompressionDriver = NewCompression()
+		d.EmailDriver = NewEmail()
 	})
 	return d
 }

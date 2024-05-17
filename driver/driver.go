@@ -8,6 +8,8 @@ import (
 type Driver struct {
 	c *conf.Conf
 	NoteDriver
+	CompressionDriver
+	EmailDriver
 }
 
 type NoteDriver interface {
@@ -21,4 +23,21 @@ type NoteInstance struct {
 	Title       string    `json:"title"`
 	Content     string    `json:"content"`
 	UpdatedTime time.Time `json:"updated_time"`
+}
+
+type CompressionDriver interface {
+	AddFiles(password string, files ...string) []byte
+	DeCompress(password string, file []byte) []CompressionFile
+}
+
+type CompressionFile struct {
+	Cate        string    `json:"cate"`
+	Filename    string    `json:"filename"`
+	Content     string    `json:"content"`
+	UpdatedTime time.Time `json:"updated_time"`
+}
+
+type EmailDriver interface {
+	SendEmail(to string, subject, content string, attachment []byte) error
+	GetAttachmentFromEmail() (data []byte, err error)
 }

@@ -3,6 +3,9 @@ module github.com/gobkc/fit
 go 1.22.3
 
 require (
+	github.com/emersion/go-imap v1.2.1
+	github.com/emersion/go-imap-id v0.0.0-20190926060100-f94a56b9ecde
+	github.com/emersion/go-message v0.18.1
 	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-gonic/gin v1.10.0
 	github.com/gobkc/do v0.0.3
@@ -20,6 +23,7 @@ require (
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
+	github.com/emersion/go-sasl v0.0.0-20231106173351-e73c9f7bad43 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
@@ -29,7 +33,7 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.20.0 // indirect
-	github.com/gobkc/to v0.0.4 // indirect
+	github.com/gobkc/to v0.0.6 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect

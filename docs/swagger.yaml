@@ -70,6 +70,15 @@ definitions:
       parameters:
         $ref: '#/definitions/rest.NewNoteRequest'
     type: object
+  rest.Response:
+    properties:
+      error:
+        type: integer
+      more:
+        type: string
+      msg:
+        type: string
+    type: object
   rest.VersionResponse:
     properties:
       apiVersion:
@@ -176,6 +185,38 @@ paths:
           schema:
             type: string
       summary: Add a new note
+      tags:
+      - public apis
+  /p/pull:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/rest.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: push fit attachment from email
+      tags:
+      - public apis
+  /p/push:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/rest.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: push all notes to email
       tags:
       - public apis
   /p/version:

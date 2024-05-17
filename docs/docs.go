@@ -137,6 +137,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/p/pull": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "public apis"
+                ],
+                "summary": "push fit attachment from email",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/rest.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/p/push": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "public apis"
+                ],
+                "summary": "push all notes to email",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/rest.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/p/version": {
             "get": {
                 "produces": [
@@ -299,6 +349,20 @@ const docTemplate = `{
                 },
                 "parameters": {
                     "$ref": "#/definitions/rest.NewNoteRequest"
+                }
+            }
+        },
+        "rest.Response": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "integer"
+                },
+                "more": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
                 }
             }
         },
