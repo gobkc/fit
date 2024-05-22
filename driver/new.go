@@ -5,10 +5,10 @@ import (
 	"sync"
 )
 
-var d Driver
+var d = &Driver{}
 var once sync.Once
 
-func NewDriver() Driver {
+func NewDriver() *Driver {
 	once.Do(func() {
 		d.c = conf.GetConf()
 		d.NoteDriver = NewNote()

@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"github.com/emersion/go-imap/client"
+	"github.com/gobkc/to"
 	"log"
 	"net"
 	"net/smtp"
@@ -15,7 +17,7 @@ import (
 )
 
 type Email struct {
-	d Driver
+	d *Driver
 }
 
 func NewEmail() EmailDriver {
@@ -59,9 +61,15 @@ func (e *Email) SendEmail(to string, subject, content string, attachment []byte)
 
 func (e *Email) GetAttachmentFromEmail() (data []byte, err error) {
 	conf := e.d.c.Email
-	err = readEmail(`imap.163.com`, 993, conf.User, conf.Pass)
-	//data, err = getAttachmentFromEmail(e.d.c.Email.Imap, e.d.c.Email.User, e.d.c.Email.Pass, `fit`)
-	return
+	var server string
+	var port int
+	if split := strings.Split(conf.Imap, `:`); len(split) != 2 {
+		return nil, errors.New("imap host must be in format <host>:<port>")
+	} else {
+		server = split[0]
+		port = to.Int[int](split[1])
+	}
+	return readEmail(server, port, conf.User, conf.Pass)
 }
 
 // buildMIMEMessage build MIME format email content
@@ -97,13 +105,12 @@ func buildMIMEMessage(headers map[string]string, body string, attachment []byte)
 	return message.String()
 }
 
-func readEmail(server string, port int, username, password string) error {
+func getIMAPReaderWriter(server string, port int, username, password string) (*bufio.Reader, *bufio.Writer, net.Conn, error) {
 	// Establish a connection to the IMAP server
 	conn, err := tls.Dial("tcp", fmt.Sprintf("%s:%d", server, port), nil)
 	if err != nil {
-		return err
+		return nil, nil, nil, err
 	}
-	defer conn.Close()
 
 	reader := bufio.NewReader(conn)
 	writer := bufio.NewWriter(conn)
@@ -111,63 +118,118 @@ func readEmail(server string, port int, username, password string) error {
 	// Read server greeting
 	_, err = reader.ReadString('\n')
 	if err != nil {
-		return err
+		return nil, nil, nil, err
 	}
 
 	// Send LOGIN command
 	if err := sendCommand(writer, reader, fmt.Sprintf("a001 LOGIN %s %s", username, password)); err != nil {
-		return err
+		return nil, nil, nil, err
 	}
 
-	// Select the INBOX
-	if err := sendCommand(writer, reader, "a002 SELECT INBOX"); err != nil {
-		return err
-	}
+	return reader, writer, conn, nil
+}
 
-	// 发送STATUS命令获取INBOX邮箱的状态信息
-	if err := sendCommand(writer, reader, "a002 STATUS INBOX (MESSAGES)"); err != nil {
-		return err
-	}
-
-	// 读取STATUS命令的响应并解析邮件数量
-	for {
-		line, err := reader.ReadString('\n')
-		if err != nil {
-			return err
-		}
-		if strings.HasPrefix(line, "* STATUS \"INBOX\" (MESSAGES") {
-			// 响应中包含了邮件数量信息
-			fmt.Println("Number of messages in INBOX:", line)
-			break
-		}
-	}
-
-	// Fetch the first email
-	if err := sendCommand(writer, reader, "a003 FETCH 2 (BODY[HEADER.FIELDS (SUBJECT)] BODY[TEXT])"); err != nil {
-		return err
+func getAttachment(reader *bufio.Reader, writer *bufio.Writer, emailId int, subject string) (attachment []byte, err error) {
+	emailCommand := fmt.Sprintf(`a003 FETCH %d (BODY[HEADER.FIELDS (SUBJECT)] BODY[TEXT])`, emailId)
+	if err = sendCommand(writer, reader, emailCommand); err != nil {
+		return nil, err
 	}
 
 	// Read email content
 	var content bytes.Buffer
+	fileTag := false
+	subjectFlag := false
+	var emailSubject string
 	for {
 		line, err := reader.ReadString('\n')
 		if err != nil {
-			return err
+			return nil, err
+		}
+		if strings.HasPrefix(line, "Subject: ") && subjectFlag == false {
+			fmt.Sscanf(line, "Subject: %s", &emailSubject)
+			if emailSubject != subject {
+				return []byte{}, errors.New(`it's not a valid fit email subject'`)
+			}
+		}
+
+		if strings.HasPrefix(line, "a003 OK") || strings.HasPrefix(line, "--boundary2fit--") {
+			break
+		}
+
+		if fileTag {
+			content.WriteString(line)
+		}
+
+		if strings.HasPrefix(line, "Content-Disposition") {
+			fileTag = true
+		}
+	}
+
+	if emailSubject == "" {
+		return nil, errors.New("no fit email subject")
+	}
+	attachment = content.Bytes()
+	if contentLen := len(attachment); contentLen > 4 {
+		attachment = attachment[2 : contentLen-2]
+	}
+
+	return attachment, nil
+}
+
+func readEmail(server string, port int, username, password string) (attachment []byte, err error) {
+	reader, writer, conn, err := getIMAPReaderWriter(server, port, username, password)
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	// Select the INBOX
+	if err := sendCommand(writer, reader, "a002 SELECT INBOX"); err != nil {
+		return nil, err
+	}
+
+	// 发送STATUS命令获取INBOX邮箱的状态信息
+	if err := sendCommand(writer, reader, "a002 STATUS INBOX (MESSAGES)"); err != nil {
+		return nil, err
+	}
+
+	// Send UID SEARCH command to get all message UIDs
+	if err := sendCommand(writer, reader, "a003 UID SEARCH ALL"); err != nil {
+		return nil, err
+	}
+
+	// Read response to UID SEARCH command to get the number of messages
+	var numMessages int
+	for {
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			return nil, err
 		}
 		if strings.HasPrefix(line, "a003 OK") {
 			break
 		}
-		content.WriteString(line)
+		if strings.HasPrefix(line, "* SEARCH") {
+			// Count the number of UIDs in the SEARCH response
+			parts := strings.Split(line, " ")
+			numMessages = len(parts) - 2 // subtract "* SEARCH " prefix
+		}
+	}
+
+	for i := numMessages; i > 0; i-- {
+		attachment, err = getAttachment(reader, writer, i, `fit`)
+		if err == nil {
+			break
+		}
 	}
 
 	// Logout
 	if err := sendCommand(writer, reader, "a004 LOGOUT"); err != nil {
-		return err
+		return nil, err
 	}
 
-	os.WriteFile(`/home/xiong/fit.email`, content.Bytes(), 0777)
+	os.WriteFile(`/home/xiong/fit.email`, attachment, 0777)
 
-	return nil
+	return
 }
 
 func sendCommand(writer *bufio.Writer, reader *bufio.Reader, command string) error {

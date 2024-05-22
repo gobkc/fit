@@ -171,21 +171,32 @@ type ListNoteResponse struct {
 	Data []driver.NoteInstance `json:"data"`
 }
 
+// ListAllNote
+//
+//	@Tags		public apis
+//	@Summary	List all notebooks
+//	@Produce	json
+//	@Param		keyword	query		string				false	"Keyword"
+//	@Success	200		{object}	ListNoteResponse	"success"
+//	@Failure	401		{object}	string				"Unauthorized"
+//	@Router		/p/list-note [get]
+func (s *Server) ListAllNote(c *gin.Context) {
+	// this is a fake feature, list all notes using the ListNote function
+}
+
 // ListNote
 //
 //	@Tags		public apis
 //	@Summary	List notebooks
 //	@Produce	json
-//	@Param		cate	path		string				true	"Category"
+//	@Param		cate	path		string				false	"Category"
+//	@Param		keyword	query		string				false	"Keyword"
 //	@Success	200		{object}	ListNoteResponse	"success"
 //	@Failure	401		{object}	string				"Unauthorized"
 //	@Router		/p/{cate}/list-note [get]
 func (s *Server) ListNote(c *gin.Context) {
 	cate := c.Param("cate")
-	if cate == `` {
-		c.JSON(http.StatusOK, Response{Error: 1, Msg: "InvalidCate"})
-		return
-	}
+	keyword := c.DefaultQuery(`keyword`, ``)
 	notes, err := s.d.ListNotes(cate)
 	if err != nil {
 		s.JSON(c, ListNoteResponse{
@@ -196,6 +207,19 @@ func (s *Server) ListNote(c *gin.Context) {
 			},
 		})
 		return
+	}
+	if keyword != `` {
+		var filteredNotes []driver.NoteInstance
+		split := strings.Split(keyword, ` `)
+		for _, note := range notes {
+			for _, key := range split {
+				if strings.Contains(note.Title, key) || strings.Contains(note.Content, key) {
+					filteredNotes = append(filteredNotes, note)
+					break
+				}
+			}
+		}
+		notes = filteredNotes
 	}
 	s.JSON(c, ListNoteResponse{
 		Data: notes,
@@ -259,8 +283,8 @@ func (s *Server) Pull(c *gin.Context) {
 	}
 	for _, file := range files {
 		cate := strings.ReplaceAll(file.Cate, cachePath, ``)
-		file.Filename = strings.ReplaceAll(file.Filename, `.md`, ``)
-		if err := s.d.NewNote(cate, file.Filename, file.Content); err != nil {
+		fileName := strings.ReplaceAll(file.Filename, `.md`, ``)
+		if err := s.d.NewNote(cate, fileName, file.Content, file.UpdatedTime); err != nil {
 			s.JSON(c, Response{
 				Error: 1,
 				Msg:   "Failed to create note",
@@ -268,7 +292,6 @@ func (s *Server) Pull(c *gin.Context) {
 			})
 			return
 		}
-
 	}
 	s.JSON(c, Response{Msg: `ok`})
 }

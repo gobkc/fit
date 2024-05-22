@@ -65,6 +65,39 @@ const docTemplate = `{
                 }
             }
         },
+        "/p/list-note": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "public apis"
+                ],
+                "summary": "List all notebooks",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Keyword",
+                        "name": "keyword",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/rest.ListNoteResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/p/new-cate": {
             "post": {
                 "produces": [
@@ -145,7 +178,7 @@ const docTemplate = `{
                 "tags": [
                     "public apis"
                 ],
-                "summary": "push fit attachment from email",
+                "summary": "pull fit attachment from email",
                 "responses": {
                     "200": {
                         "description": "success",
@@ -220,8 +253,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Category",
                         "name": "cate",
-                        "in": "path",
-                        "required": true
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Keyword",
+                        "name": "keyword",
+                        "in": "query"
                     }
                 ],
                 "responses": {

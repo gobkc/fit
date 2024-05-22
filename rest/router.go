@@ -53,6 +53,7 @@ func (s *Server) public() {
 	r.GET(`list-cate`, s.ListCate)
 	r.POST(`new-cate`, s.NewCate)
 	r.GET(`/:cate/list-note`, s.ListNote)
+	r.GET(`list-note`, s.ListNote)
 	r.POST(`push`, s.Push)
 	r.POST(`pull`, s.Pull)
 }

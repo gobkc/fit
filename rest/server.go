@@ -14,7 +14,7 @@ import (
 
 type Server struct {
 	*gin.Engine
-	d driver.Driver
+	d *driver.Driver
 	c *conf.Conf
 }
 

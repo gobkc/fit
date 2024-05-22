@@ -16,17 +16,17 @@ import (
 )
 
 type Compression struct {
-	d Driver
+	d *Driver
 }
 
-func NewCompression() *Compression {
+func NewCompression() CompressionDriver {
 	return &Compression{d: d}
 }
 
 func (c *Compression) AddFiles(password string, files ...string) []byte {
 	cachePath := conf.GetCachePath()
 	if len(files) == 0 {
-		files = c.getAllFiles(cachePath)
+		files = c.GetAllFiles(cachePath)
 	}
 	var allBytes bytes.Buffer
 	separator := '\u200D'
@@ -96,14 +96,21 @@ func (c *Compression) DeCompress(password string, file []byte) (files []Compress
 		}
 		fileHeader, fileContent := fileSplit[0], fileSplit[1]
 		if fileContentLen := len(fileContent); i < splitListLen-1 && fileContentLen > 0 {
-			fileContent = fileContent[:fileContentLen-1]
+			wrap := fileContent[fileContentLen-1:]
+			// wrap[0] is \n
+			if wrap[0] == 10 {
+				fileContent = fileContent[:fileContentLen-1]
+			}
 		}
 		fileMetaSplit := SplitFirst(fileHeader, []byte(string(timeSeparator)))
 		if len(fileMetaSplit) != 2 {
 			continue
 		}
 		fullPath := cachePath + string(fileMetaSplit[0])
-		updatedTime, _ := time.Parse(time.DateTime, string(fileMetaSplit[1]))
+		updatedTime, err := time.Parse(time.DateTime, strings.TrimSpace(string(fileMetaSplit[1])))
+		if err != nil {
+			slog.Default().Warn(`failed to parse file time`, slog.String(`error`, err.Error()))
+		}
 		cate := filepath.Dir(fullPath)
 		filename := filepath.Base(fullPath)
 		files = append(files, CompressionFile{
@@ -124,7 +131,7 @@ func SplitFirst(s, sep []byte) [][]byte {
 	return [][]byte{s[:index], s[index+len(sep):]}
 }
 
-func (c *Compression) getAllFiles(dir string) []string {
+func (c *Compression) GetAllFiles(dir string) []string {
 	var files []string
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {

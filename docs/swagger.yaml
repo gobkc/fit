@@ -93,7 +93,10 @@ paths:
       - description: Category
         in: path
         name: cate
-        required: true
+        type: string
+      - description: Keyword
+        in: query
+        name: keyword
         type: string
       produces:
       - application/json
@@ -139,6 +142,27 @@ paths:
           schema:
             type: string
       summary: List notebook categories
+      tags:
+      - public apis
+  /p/list-note:
+    get:
+      parameters:
+      - description: Keyword
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/rest.ListNoteResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: List all notebooks
       tags:
       - public apis
   /p/new-cate:
@@ -200,7 +224,7 @@ paths:
           description: Unauthorized
           schema:
             type: string
-      summary: push fit attachment from email
+      summary: pull fit attachment from email
       tags:
       - public apis
   /p/push:
