@@ -1,4 +1,59 @@
 definitions:
+  conf.Conf:
+    properties:
+      cors:
+        $ref: '#/definitions/conf.Cors'
+      debug:
+        type: boolean
+      dsn:
+        type: string
+      email:
+        $ref: '#/definitions/conf.Email'
+      jwt_salt:
+        type: string
+      max_conn:
+        type: integer
+      max_idle:
+        type: integer
+      max_left_time:
+        type: integer
+      rest_addr:
+        type: string
+      version:
+        type: string
+    type: object
+  conf.Cors:
+    properties:
+      allow_credentials:
+        type: boolean
+      allowed_headers:
+        items:
+          type: string
+        type: array
+      allowed_methods:
+        items:
+          type: string
+        type: array
+      allowed_origins:
+        items:
+          type: string
+        type: array
+      enabled:
+        type: boolean
+      max_age:
+        type: integer
+    type: object
+  conf.Email:
+    properties:
+      imap:
+        type: string
+      pass:
+        type: string
+      smtp:
+        type: string
+      user:
+        type: string
+    type: object
   driver.NoteInstance:
     properties:
       content:
@@ -13,6 +68,19 @@ definitions:
       data:
         items:
           type: string
+        type: array
+      error:
+        type: integer
+      more:
+        type: string
+      msg:
+        type: string
+    type: object
+  rest.ListConfResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/conf.Conf'
         type: array
       error:
         type: integer
@@ -142,6 +210,22 @@ paths:
           schema:
             type: string
       summary: List notebook categories
+      tags:
+      - public apis
+  /p/list-conf:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/rest.ListConfResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: List notebook configurations
       tags:
       - public apis
   /p/list-note:

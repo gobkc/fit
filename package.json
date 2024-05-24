@@ -1,0 +1,41 @@
+{
+  "name": "fit-fe",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "run-p type-check \"build-only {@}\" --",
+    "preview": "vite preview",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build --force"
+  },
+  "dependencies": {
+    "@element-plus/icons": "^0.0.11",
+    "@element-plus/icons-vue": "^2.1.0",
+    "@types/axios": "^0.14.0",
+    "@types/qs": "^6.9.10",
+    "axios": "^1.7.2",
+    "element-plus": "^2.4.2",
+    "parse-headers": "^2.0.5",
+    "pinia": "^2.1.7",
+    "qs": "^6.12.1",
+    "vite-plugin-compression": "^0.5.1",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@iconify-json/ep": "^1.1.12",
+    "@tsconfig/node20": "^20.1.4",
+    "@types/node": "^20.12.5",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/tsconfig": "^0.5.1",
+    "npm-run-all2": "^6.1.2",
+    "typescript": "~5.4.0",
+    "unplugin-auto-import": "^0.16.7",
+    "unplugin-icons": "^0.17.4",
+    "unplugin-vue-components": "^0.25.2",
+    "vite": "^5.2.11",
+    "vue-tsc": "^2.0.11"
+  }
+}

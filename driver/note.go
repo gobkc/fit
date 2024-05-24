@@ -97,6 +97,10 @@ func (n *Note) NewCate(cate string) error {
 	return nil
 }
 
+func (n *Note) ListConfigurations() (list []conf.Conf, err error) {
+	return conf.GetConfigurations(), nil
+}
+
 func NewNote() NoteDriver {
 	return &Note{d: d}
 }

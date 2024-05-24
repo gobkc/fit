@@ -4,6 +4,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gobkc/fit/conf"
+	"time"
 )
 
 func WithCORS() gin.HandlerFunc {
@@ -14,7 +15,7 @@ func WithCORS() gin.HandlerFunc {
 			AllowMethods:     c.Cors.AllowedMethods,
 			AllowHeaders:     c.Cors.AllowedHeaders,
 			AllowCredentials: c.Cors.AllowCredentials,
-			MaxAge:           c.Cors.MaxAge,
+			MaxAge:           time.Duration(c.Cors.MaxAge),
 			ExposeHeaders:    c.Cors.AllowedHeaders,
 		}
 		return cors.New(corsConfig)

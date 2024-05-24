@@ -65,6 +65,31 @@ const docTemplate = `{
                 }
             }
         },
+        "/p/list-conf": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "public apis"
+                ],
+                "summary": "List notebook configurations",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/rest.ListConfResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/p/list-note": {
             "get": {
                 "produces": [
@@ -280,6 +305,90 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "conf.Conf": {
+            "type": "object",
+            "properties": {
+                "cors": {
+                    "$ref": "#/definitions/conf.Cors"
+                },
+                "debug": {
+                    "type": "boolean"
+                },
+                "dsn": {
+                    "type": "string"
+                },
+                "email": {
+                    "$ref": "#/definitions/conf.Email"
+                },
+                "jwt_salt": {
+                    "type": "string"
+                },
+                "max_conn": {
+                    "type": "integer"
+                },
+                "max_idle": {
+                    "type": "integer"
+                },
+                "max_left_time": {
+                    "type": "integer"
+                },
+                "rest_addr": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "conf.Cors": {
+            "type": "object",
+            "properties": {
+                "allow_credentials": {
+                    "type": "boolean"
+                },
+                "allowed_headers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "allowed_methods": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "allowed_origins": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "max_age": {
+                    "type": "integer"
+                }
+            }
+        },
+        "conf.Email": {
+            "type": "object",
+            "properties": {
+                "imap": {
+                    "type": "string"
+                },
+                "pass": {
+                    "type": "string"
+                },
+                "smtp": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                }
+            }
+        },
         "driver.NoteInstance": {
             "type": "object",
             "properties": {
@@ -301,6 +410,26 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "type": "string"
+                    }
+                },
+                "error": {
+                    "type": "integer"
+                },
+                "more": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.ListConfResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/conf.Conf"
                     }
                 },
                 "error": {

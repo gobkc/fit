@@ -295,3 +295,36 @@ func (s *Server) Pull(c *gin.Context) {
 	}
 	s.JSON(c, Response{Msg: `ok`})
 }
+
+type ListConfResponse struct {
+	Response
+	Data []conf.Conf `json:"data"`
+}
+
+// ListConf
+//
+//	@Tags		public apis
+//	@Summary	List notebook configurations
+//	@Produce	json
+//	@Success	200	{object}	ListConfResponse	"success"
+//	@Failure	401	{object}	string				"Unauthorized"
+//	@Router		/p/list-conf [get]
+func (s *Server) ListConf(c *gin.Context) {
+	list, err := s.d.ListConfigurations()
+	if err != nil {
+		s.JSON(c, ListConfResponse{
+			Response: Response{
+				Error: 1,
+				Msg:   "Failed to list configurations",
+				More:  err.Error(),
+			},
+		})
+		return
+	}
+	s.JSON(c, ListConfResponse{
+		Data: list,
+		Response: Response{
+			Msg: "OK",
+		}},
+	)
+}

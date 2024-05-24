@@ -56,6 +56,7 @@ func (s *Server) public() {
 	r.GET(`list-note`, s.ListNote)
 	r.POST(`push`, s.Push)
 	r.POST(`pull`, s.Pull)
+	r.GET(`list-conf`, s.ListConf)
 }
 
 // static routers (No authorization required)

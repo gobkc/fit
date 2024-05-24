@@ -1,0 +1,50 @@
+@import './base.css';
+
+a, .green {
+    text-decoration: none;
+    color: hsla(160, 100%, 37%, 1);
+    transition: 0.4s;
+}
+
+@media (min-width: 1024px) {
+}
+
+html, body, #app, .el-container {
+    padding: 0px;
+    margin: 0px;
+    height: 100%;
+    overflow: auto;
+}
+
+.el-main {
+    overflow: auto;
+}
+
+.collapse-menu {
+    left: 8px;
+    top: 36px;
+    position: absolute;
+    border: none !important;
+}
+
+.collapse-menu .el-icon {
+    font-size: 24px;
+}
+
+aside {
+    background-color: #87CEEB;
+}
+
+.el-menu {
+    border-right: none !important;
+}
+
+header {
+    background-color: #4682B4;
+}
+
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

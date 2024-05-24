@@ -1,8 +1,7 @@
 package conf
 
-import "time"
-
 type Conf struct {
+	Name        string `json:"name"`
 	Version     string `json:"version"`
 	Debug       bool   `json:"debug"`
 	RestAddr    string `json:"rest_addr"`
@@ -16,12 +15,12 @@ type Conf struct {
 }
 
 type Cors struct {
-	Enabled          bool          `json:"enabled"`
-	MaxAge           time.Duration `json:"max_age"`
-	AllowedOrigins   []string      `json:"allowed_origins"`
-	AllowedMethods   []string      `json:"allowed_methods"`
-	AllowedHeaders   []string      `json:"allowed_headers"`
-	AllowCredentials bool          `json:"allow_credentials"`
+	Enabled          bool     `json:"enabled"`
+	MaxAge           int      `json:"max_age"`
+	AllowedOrigins   []string `json:"allowed_origins"`
+	AllowedMethods   []string `json:"allowed_methods"`
+	AllowedHeaders   []string `json:"allowed_headers"`
+	AllowCredentials bool     `json:"allow_credentials"`
 }
 
 type Email struct {
