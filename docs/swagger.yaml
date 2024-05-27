@@ -17,6 +17,8 @@ definitions:
         type: integer
       max_left_time:
         type: integer
+      name:
+        type: string
       rest_addr:
         type: string
       version:
@@ -63,6 +65,22 @@ definitions:
       updated_time:
         type: string
     type: object
+  rest.EnableConfRequest:
+    properties:
+      conf:
+        $ref: '#/definitions/conf.Conf'
+    type: object
+  rest.EnableConfResponse:
+    properties:
+      error:
+        type: integer
+      more:
+        type: string
+      msg:
+        type: string
+      parameters:
+        $ref: '#/definitions/rest.EnableConfRequest'
+    type: object
   rest.ListCateResponse:
     properties:
       data:
@@ -84,6 +102,8 @@ definitions:
         type: array
       error:
         type: integer
+      main_conf:
+        type: string
       more:
         type: string
       msg:
@@ -178,6 +198,29 @@ paths:
           schema:
             type: string
       summary: List notebooks
+      tags:
+      - public apis
+  /p/enable-conf:
+    post:
+      parameters:
+      - description: request parameters, must be fill in
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/rest.EnableConfRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/rest.EnableConfResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: upsert & enable a configuration
       tags:
       - public apis
   /p/health:

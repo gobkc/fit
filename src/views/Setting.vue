@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {reactive, getCurrentInstance} from 'vue'
-import type {AppConfig} from "../api/interface"
+import type {AppConfig, ListConfigurationsResponse} from "../api/interface"
 
 const {proxy}: any = getCurrentInstance();
 const {api, $router} = proxy;
@@ -44,18 +44,66 @@ const initialAppConfig: AppConfig = {
   "jwt_salt": ""
 }
 
+const newConfig: AppConfig = {
+  "name": "",
+  "version": "v1/api",
+  "debug": true,
+  "rest_addr": ":5555",
+  "dsn": "",
+  "email": {
+    "imap": "imap.qq.com:993",
+    "smtp": "smtp.qq.com:587",
+    "user": "",
+    "pass": ""
+  },
+  "cors": {
+    "enabled": true,
+    "max_age": 10000000,
+    "allowed_origins": [
+      "*"
+    ],
+    "allowed_methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "HEAD",
+      "OPTIONS"
+    ],
+    "allowed_headers": [
+      "*",
+      "Authorization"
+    ],
+    "allow_credentials": true
+  },
+  "max_idle": 0,
+  "max_conn": 0,
+  "max_left_time": 0,
+  "jwt_salt": ""
+}
+
 const settings: AppConfig = reactive(initialAppConfig)
 
 const configurations: AppConfig[] = reactive([])
 
-const conf = api.listConfigurations().then((appConfigs: AppConfig[]) => {
-  Object.assign(configurations, appConfigs);
+const conf = api.listConfigurations().then((response:ListConfigurationsResponse)=>{
+  Object.assign(configurations, response.data);
+  if (response.main_conf){
+    settings.name = response.main_conf
+    change_conf(settings.name)
+  }
 })
 
 const change_conf = (config_name: string) => {
   const foundConfig = configurations.find(config => config.name === config_name);
   if (foundConfig) {
     Object.assign(settings, foundConfig);
+  }else {
+    newConfig.name=''
+    newConfig.email.user=''
+    newConfig.email.pass=''
+    Object.assign(settings, newConfig);
   }
 }
 
@@ -102,7 +150,7 @@ const change_conf = (config_name: string) => {
             <el-input v-model="settings.email.user"/>
           </el-form-item>
           <el-form-item label="Password">
-            <el-input v-model="settings.email.pass"/>
+            <el-input v-model="settings.email.pass" type="password" show-password/>
           </el-form-item>
           <el-form-item>
             <el-button :type="settings.name==``?`primary`:`success`">

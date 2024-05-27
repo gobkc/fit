@@ -70,4 +70,5 @@ export interface ListConfigurationsResponse {
     msg: string,
     more: string,
     data: AppConfig[],
+    main_conf: string,
 }

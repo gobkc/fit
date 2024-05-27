@@ -15,6 +15,42 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/p/enable-conf": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "public apis"
+                ],
+                "summary": "upsert \u0026 enable a configuration",
+                "parameters": [
+                    {
+                        "description": "request parameters, must be fill in",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rest.EnableConfRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/rest.EnableConfResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/p/health": {
             "get": {
                 "produces": [
@@ -332,6 +368,9 @@ const docTemplate = `{
                 "max_left_time": {
                     "type": "integer"
                 },
+                "name": {
+                    "type": "string"
+                },
                 "rest_addr": {
                     "type": "string"
                 },
@@ -403,6 +442,31 @@ const docTemplate = `{
                 }
             }
         },
+        "rest.EnableConfRequest": {
+            "type": "object",
+            "properties": {
+                "conf": {
+                    "$ref": "#/definitions/conf.Conf"
+                }
+            }
+        },
+        "rest.EnableConfResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "integer"
+                },
+                "more": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                },
+                "parameters": {
+                    "$ref": "#/definitions/rest.EnableConfRequest"
+                }
+            }
+        },
         "rest.ListCateResponse": {
             "type": "object",
             "properties": {
@@ -434,6 +498,9 @@ const docTemplate = `{
                 },
                 "error": {
                     "type": "integer"
+                },
+                "main_conf": {
+                    "type": "string"
                 },
                 "more": {
                     "type": "string"

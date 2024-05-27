@@ -17,7 +17,8 @@ type NoteDriver interface {
 	ListCate() (list []string, err error)
 	NewCate(cate string) error
 	ListNotes(cate string) (list []NoteInstance, err error)
-	ListConfigurations() (list []conf.Conf, err error)
+	ListConfigurations() (list []conf.Conf, mainConf string, err error)
+	EnableConfiguration(conf conf.Conf) (err error)
 }
 
 type NoteInstance struct {

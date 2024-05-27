@@ -75,11 +75,11 @@ export class Api {
         }).then(response => response.data as Response);
     }
 
-    listConfigurations(): Promise<AppConfig[]> {
+    listConfigurations(): Promise<ListConfigurationsResponse> {
         return http({
             url: `/p/list-conf`,
             method: 'get',
             data: {}
-        }).then(response => response.data as AppConfig[]);
+        }).then(response => response.data as ListConfigurationsResponse);
     }
 }

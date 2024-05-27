@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"encoding/json"
 	"fmt"
 	gext "github.com/gobkc/ext"
 	"log/slog"
@@ -8,6 +9,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"sync"
+	"time"
 )
 
 var once sync.Once
@@ -67,7 +69,7 @@ func GetConfigPath() string {
 	return fmt.Sprintf(`%s%s.config%s.fit%sconfig.json`, homeDir, pathSeparator, pathSeparator, pathSeparator)
 }
 
-func GetConfigurations() (configurations []Conf) {
+func GetConfigurations() (configurations []Conf, mainConf string) {
 	homeDir := GetHomeDir()
 	pathSeparator := string(os.PathSeparator)
 	fitConfig := homeDir + pathSeparator + `.config` + pathSeparator + `.fit`
@@ -84,6 +86,9 @@ func GetConfigurations() (configurations []Conf) {
 			if err = js.UnMarshal(path, &newConf); err != nil {
 				slog.Default().Error(`can't load config.json'`, slog.Any(`path`, path), slog.Any(`error detail`, err))
 				return nil
+			}
+			if info.Name() == `config.json` {
+				mainConf = newConf.Name
 			}
 			configurations = append(configurations, newConf)
 		}
@@ -111,4 +116,35 @@ func isNotExistCreateDir(dirName string) {
 	if os.IsNotExist(err) {
 		os.MkdirAll(dirName, 0777)
 	}
+}
+
+func EnableConfiguration(conf Conf) (err error) {
+	homeDir := GetHomeDir()
+	pathSeparator := string(os.PathSeparator)
+	fitConfig := homeDir + pathSeparator + `.config` + pathSeparator + `.fit`
+	fitCache := homeDir + pathSeparator + `.cache` + pathSeparator + `.fit`
+	isNotExistCreateDir(fitConfig)
+	isNotExistCreateDir(fitCache)
+	_ = filepath.Walk(fitConfig, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			js := gext.Factory[gext.Json]()
+			newConf := Conf{}
+			if err = js.UnMarshal(path, &newConf); err != nil {
+				slog.Default().Error(`can't load config.json'`, slog.Any(`path`, path), slog.Any(`error detail`, err))
+				return nil
+			}
+			if info.Name() == `config.json` {
+				if newConf.Name != conf.Name {
+					os.Rename(path, fmt.Sprintf(`%s%s%v.json`, fitConfig, pathSeparator, time.Now().Unix()))
+				}
+				b, _ := json.Marshal(conf)
+				os.WriteFile(path, b, 0777)
+			}
+		}
+		return nil
+	})
+	return nil
 }

@@ -298,7 +298,8 @@ func (s *Server) Pull(c *gin.Context) {
 
 type ListConfResponse struct {
 	Response
-	Data []conf.Conf `json:"data"`
+	Data     []conf.Conf `json:"data"`
+	MainConf string      `json:"main_conf"`
 }
 
 // ListConf
@@ -310,7 +311,7 @@ type ListConfResponse struct {
 //	@Failure	401	{object}	string				"Unauthorized"
 //	@Router		/p/list-conf [get]
 func (s *Server) ListConf(c *gin.Context) {
-	list, err := s.d.ListConfigurations()
+	list, mainConf, err := s.d.ListConfigurations()
 	if err != nil {
 		s.JSON(c, ListConfResponse{
 			Response: Response{
@@ -322,7 +323,95 @@ func (s *Server) ListConf(c *gin.Context) {
 		return
 	}
 	s.JSON(c, ListConfResponse{
-		Data: list,
+		Response: Response{
+			Msg: "OK",
+		},
+		Data:     list,
+		MainConf: mainConf,
+	},
+	)
+}
+
+type EnableConfRequest struct {
+	Conf conf.Conf `json:"conf"`
+}
+
+type EnableConfResponse struct {
+	Response
+	Parameters EnableConfRequest `json:"parameters"`
+}
+
+// EnableConf
+//
+//	@Tags		public apis
+//	@Summary	upsert & enable a configuration
+//	@Produce	json
+//	@Param		data	body		EnableConfRequest	true	"request parameters, must be fill in"
+//	@Success	200		{object}	EnableConfResponse	"success"
+//	@Failure	401		{object}	string				"Unauthorized"
+//	@Router		/p/enable-conf [post]
+func (s *Server) EnableConf(c *gin.Context) {
+	request := EnableConfRequest{}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusOK, Response{Error: 1, More: err.Error(), Msg: "ParameterError"})
+		return
+	}
+	if err := s.d.EnableConfiguration(request.Conf); err != nil {
+		s.JSON(c, EnableConfResponse{
+			Parameters: request,
+			Response: Response{
+				Error: 1,
+				Msg:   "Failed to enable configuration",
+				More:  err.Error(),
+			},
+		})
+		return
+	}
+	s.JSON(c, EnableConfResponse{
+		Parameters: request,
+		Response: Response{
+			Msg: "OK",
+		}},
+	)
+}
+
+type DeleteConfRequest struct {
+	Name string `json:"name"`
+}
+
+type DeleteConfResponse struct {
+	Response
+	Parameters DeleteConfRequest `json:"parameters"`
+}
+
+// DeleteConf
+//
+//	@Tags		public apis
+//	@Summary	delete a configuration
+//	@Produce	json
+//	@Param		data	body		DeleteConfRequest	true	"request parameters, must be fill in"
+//	@Success	200		{object}	DeleteConfResponse	"success"
+//	@Failure	401		{object}	string				"Unauthorized"
+//	@Router		/p/conf [delete]
+func (s *Server) DeleteConf(c *gin.Context) {
+	request := DeleteConfRequest{}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusOK, Response{Error: 1, More: err.Error(), Msg: "ParameterError"})
+		return
+	}
+	//if err := s.d.DeleteConfiguration(request.Conf); err != nil {
+	//	s.JSON(c, DeleteConfResponse{
+	//		Parameters: request,
+	//		Response: Response{
+	//			Error: 1,
+	//			Msg:   "Failed to enable configuration",
+	//			More:  err.Error(),
+	//		},
+	//	})
+	//	return
+	//}
+	s.JSON(c, DeleteConfResponse{
+		Parameters: request,
 		Response: Response{
 			Msg: "OK",
 		}},

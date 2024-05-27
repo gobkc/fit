@@ -37,7 +37,7 @@ http.interceptors.response.use(
         if (split.length === 2) {
             localStorage.setItem('fit-fe', split[1]);
         }
-        return Promise.resolve(response.data);
+        return Promise.resolve(response);
     },
     (error) => {
         console.log(error.code);

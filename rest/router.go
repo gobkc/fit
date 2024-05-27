@@ -57,6 +57,8 @@ func (s *Server) public() {
 	r.POST(`push`, s.Push)
 	r.POST(`pull`, s.Pull)
 	r.GET(`list-conf`, s.ListConf)
+	r.POST(`enable-conf`, s.EnableConf)
+	r.DELETE(`conf`, s.DeleteConf)
 }
 
 // static routers (No authorization required)
