@@ -118,7 +118,7 @@ func isNotExistCreateDir(dirName string) {
 	}
 }
 
-func EnableConfiguration(conf Conf) (err error) {
+func EnableConfiguration(c Conf) (err error) {
 	homeDir := GetHomeDir()
 	pathSeparator := string(os.PathSeparator)
 	fitConfig := homeDir + pathSeparator + `.config` + pathSeparator + `.fit`
@@ -137,11 +137,58 @@ func EnableConfiguration(conf Conf) (err error) {
 				return nil
 			}
 			if info.Name() == `config.json` {
-				if newConf.Name != conf.Name {
+				if newConf.Name != c.Name {
 					os.Rename(path, fmt.Sprintf(`%s%s%v.json`, fitConfig, pathSeparator, time.Now().Unix()))
 				}
-				b, _ := json.Marshal(conf)
+				b, _ := json.Marshal(c)
 				os.WriteFile(path, b, 0777)
+				conf = &newConf
+			} else {
+				if newConf.Name == c.Name {
+					deleteFile := fmt.Sprintf(`%s%s%v`, fitConfig, pathSeparator, info.Name())
+					os.Remove(deleteFile)
+				}
+			}
+		}
+		return nil
+	})
+	return nil
+}
+
+func CreateConfiguration(c Conf) (err error) {
+	homeDir := GetHomeDir()
+	pathSeparator := string(os.PathSeparator)
+	fitConfig := homeDir + pathSeparator + `.config` + pathSeparator + `.fit`
+	fitCache := homeDir + pathSeparator + `.cache` + pathSeparator + `.fit`
+	isNotExistCreateDir(fitConfig)
+	isNotExistCreateDir(fitCache)
+	newConfFile := fitConfig + pathSeparator + fmt.Sprintf(`%v.json`, time.Now().Unix())
+	b, _ := json.Marshal(c)
+	os.WriteFile(newConfFile, b, 0777)
+	return nil
+}
+
+func DeleteConfiguration(fileName string) (err error) {
+	homeDir := GetHomeDir()
+	pathSeparator := string(os.PathSeparator)
+	fitConfig := homeDir + pathSeparator + `.config` + pathSeparator + `.fit`
+	fitCache := homeDir + pathSeparator + `.cache` + pathSeparator + `.fit`
+	isNotExistCreateDir(fitConfig)
+	isNotExistCreateDir(fitCache)
+	_ = filepath.Walk(fitConfig, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			js := gext.Factory[gext.Json]()
+			newConf := Conf{}
+			if err = js.UnMarshal(path, &newConf); err != nil {
+				slog.Default().Error(`can't load config.json'`, slog.Any(`path`, path), slog.Any(`error detail`, err))
+				return nil
+			}
+			if newConf.Name == fileName {
+				deleteFile := fmt.Sprintf(`%s%s%v`, fitConfig, pathSeparator, info.Name())
+				os.Remove(deleteFile)
 			}
 		}
 		return nil

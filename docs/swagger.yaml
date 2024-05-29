@@ -65,6 +65,38 @@ definitions:
       updated_time:
         type: string
     type: object
+  rest.CreateConfRequest:
+    properties:
+      conf:
+        $ref: '#/definitions/conf.Conf'
+    type: object
+  rest.CreateConfResponse:
+    properties:
+      error:
+        type: integer
+      more:
+        type: string
+      msg:
+        type: string
+      parameters:
+        $ref: '#/definitions/rest.CreateConfRequest'
+    type: object
+  rest.DeleteConfRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  rest.DeleteConfResponse:
+    properties:
+      error:
+        type: integer
+      more:
+        type: string
+      msg:
+        type: string
+      parameters:
+        $ref: '#/definitions/rest.DeleteConfRequest'
+    type: object
   rest.EnableConfRequest:
     properties:
       conf:
@@ -198,6 +230,52 @@ paths:
           schema:
             type: string
       summary: List notebooks
+      tags:
+      - public apis
+  /p/conf:
+    delete:
+      parameters:
+      - description: request parameters, must be fill in
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/rest.DeleteConfRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/rest.DeleteConfResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: delete a configuration
+      tags:
+      - public apis
+  /p/create-conf:
+    post:
+      parameters:
+      - description: request parameters, must be fill in
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/rest.CreateConfRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/rest.CreateConfResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: create a new configuration
       tags:
       - public apis
   /p/enable-conf:

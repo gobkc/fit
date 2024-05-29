@@ -15,6 +15,78 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/p/conf": {
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "public apis"
+                ],
+                "summary": "delete a configuration",
+                "parameters": [
+                    {
+                        "description": "request parameters, must be fill in",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rest.DeleteConfRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/rest.DeleteConfResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/p/create-conf": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "public apis"
+                ],
+                "summary": "create a new configuration",
+                "parameters": [
+                    {
+                        "description": "request parameters, must be fill in",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rest.CreateConfRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/rest.CreateConfResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/p/enable-conf": {
             "post": {
                 "produces": [
@@ -439,6 +511,56 @@ const docTemplate = `{
                 },
                 "updated_time": {
                     "type": "string"
+                }
+            }
+        },
+        "rest.CreateConfRequest": {
+            "type": "object",
+            "properties": {
+                "conf": {
+                    "$ref": "#/definitions/conf.Conf"
+                }
+            }
+        },
+        "rest.CreateConfResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "integer"
+                },
+                "more": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                },
+                "parameters": {
+                    "$ref": "#/definitions/rest.CreateConfRequest"
+                }
+            }
+        },
+        "rest.DeleteConfRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.DeleteConfResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "integer"
+                },
+                "more": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                },
+                "parameters": {
+                    "$ref": "#/definitions/rest.DeleteConfRequest"
                 }
             }
         },

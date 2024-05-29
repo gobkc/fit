@@ -106,6 +106,14 @@ func (n *Note) EnableConfiguration(c conf.Conf) (err error) {
 	return conf.EnableConfiguration(c)
 }
 
+func (n *Note) CreateConfiguration(c conf.Conf) (err error) {
+	return conf.CreateConfiguration(c)
+}
+
+func (n *Note) DeleteConfiguration(fileName string) (err error) {
+	return conf.DeleteConfiguration(fileName)
+}
+
 func NewNote() NoteDriver {
 	return &Note{d: d}
 }

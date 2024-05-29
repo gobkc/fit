@@ -332,6 +332,49 @@ func (s *Server) ListConf(c *gin.Context) {
 	)
 }
 
+type CreateConfRequest struct {
+	Conf conf.Conf `json:"conf"`
+}
+
+type CreateConfResponse struct {
+	Response
+	Parameters CreateConfRequest `json:"parameters"`
+}
+
+// CreateConf
+//
+//	@Tags		public apis
+//	@Summary	create a new configuration
+//	@Produce	json
+//	@Param		data	body		CreateConfRequest	true	"request parameters, must be fill in"
+//	@Success	200		{object}	CreateConfResponse	"success"
+//	@Failure	401		{object}	string				"Unauthorized"
+//	@Router		/p/create-conf [post]
+func (s *Server) CreateConf(c *gin.Context) {
+	request := CreateConfRequest{}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusOK, Response{Error: 1, More: err.Error(), Msg: "ParameterError"})
+		return
+	}
+	if err := s.d.CreateConfiguration(request.Conf); err != nil {
+		s.JSON(c, CreateConfResponse{
+			Parameters: request,
+			Response: Response{
+				Error: 1,
+				Msg:   "Failed to create configuration",
+				More:  err.Error(),
+			},
+		})
+		return
+	}
+	s.JSON(c, CreateConfResponse{
+		Parameters: request,
+		Response: Response{
+			Msg: "OK",
+		}},
+	)
+}
+
 type EnableConfRequest struct {
 	Conf conf.Conf `json:"conf"`
 }
@@ -399,17 +442,17 @@ func (s *Server) DeleteConf(c *gin.Context) {
 		c.JSON(http.StatusOK, Response{Error: 1, More: err.Error(), Msg: "ParameterError"})
 		return
 	}
-	//if err := s.d.DeleteConfiguration(request.Conf); err != nil {
-	//	s.JSON(c, DeleteConfResponse{
-	//		Parameters: request,
-	//		Response: Response{
-	//			Error: 1,
-	//			Msg:   "Failed to enable configuration",
-	//			More:  err.Error(),
-	//		},
-	//	})
-	//	return
-	//}
+	if err := s.d.DeleteConfiguration(request.Name); err != nil {
+		s.JSON(c, DeleteConfResponse{
+			Parameters: request,
+			Response: Response{
+				Error: 1,
+				Msg:   "Failed to delete configuration",
+				More:  err.Error(),
+			},
+		})
+		return
+	}
 	s.JSON(c, DeleteConfResponse{
 		Parameters: request,
 		Response: Response{

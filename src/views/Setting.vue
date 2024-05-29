@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import {reactive, getCurrentInstance} from 'vue'
-import type {AppConfig, ListConfigurationsResponse} from "../api/interface"
+import {Select} from '@element-plus/icons-vue'
+import type {AppConfig, ListConfigurationsResponse, Response} from "../api/interface"
+import {ElMessage} from "element-plus";
 
 const {proxy}: any = getCurrentInstance();
 const {api, $router} = proxy;
@@ -87,23 +89,67 @@ const settings: AppConfig = reactive(initialAppConfig)
 
 const configurations: AppConfig[] = reactive([])
 
-const conf = api.listConfigurations().then((response:ListConfigurationsResponse)=>{
-  Object.assign(configurations, response.data);
-  if (response.main_conf){
-    settings.name = response.main_conf
-    change_conf(settings.name)
-  }
+const app = reactive({
+  name: ``,
+  create_mode: false,
 })
+
+const listConfigurations = () => {
+  api.listConfigurations().then((response: ListConfigurationsResponse) => {
+    configurations.splice(0, configurations.length);
+    Object.assign(configurations, response.data);
+    if (response.main_conf) {
+      settings.name = response.main_conf
+      change_conf(settings.name)
+    }
+    app.name = response.main_conf
+    app.create_mode = settings.name == ``
+  })
+}
+
+listConfigurations()
 
 const change_conf = (config_name: string) => {
   const foundConfig = configurations.find(config => config.name === config_name);
   if (foundConfig) {
     Object.assign(settings, foundConfig);
-  }else {
-    newConfig.name=''
-    newConfig.email.user=''
-    newConfig.email.pass=''
+    app.create_mode = false
+  } else {
+    newConfig.name = ''
+    newConfig.email.user = ''
+    newConfig.email.pass = ''
+    newConfig.email.imap = 'imap.qq.com:993'
+    newConfig.email.smtp = 'smtp.qq.com:587'
+    newConfig.version = `v1/api`
+    newConfig.rest_addr = `:5555`
     Object.assign(settings, newConfig);
+    app.create_mode = true
+  }
+  app.create_mode = settings.name == ``
+}
+
+const deleteConfiguration = (config_name: string) => {
+  api.deleteConfigurations(config_name).then((r: Response) => {
+    newConfig.name = ''
+    newConfig.email.user = ''
+    newConfig.email.pass = ''
+    Object.assign(settings, newConfig);
+    listConfigurations()
+    ElMessage.warning(r.msg)
+  })
+}
+
+const upsert = () => {
+  if (app.create_mode) {
+    //create a new configuration
+    api.createConfiguration(settings).then((r: Response) => {
+      listConfigurations()
+    })
+  } else {
+    //enable configuration
+    api.enableConfiguration(settings).then((r: Response) => {
+      listConfigurations()
+    })
   }
 }
 
@@ -132,7 +178,7 @@ const change_conf = (config_name: string) => {
             </el-select>
           </el-form-item>
           <el-form-item label="Configuration Name">
-            <el-input v-model="settings.name"/>
+            <el-input v-model="settings.name" :suffix-icon="app.name==settings.name?Select:''" class="green_icon"/>
           </el-form-item>
           <el-form-item label="Api Version">
             <el-input v-model="settings.version"/>
@@ -153,10 +199,10 @@ const change_conf = (config_name: string) => {
             <el-input v-model="settings.email.pass" type="password" show-password/>
           </el-form-item>
           <el-form-item>
-            <el-button :type="settings.name==``?`primary`:`success`">
-              {{ settings.name == `` ? `Create Configuration` : `Enable Configuration` }}
+            <el-button :type="app.create_mode?`primary`:`success`" v-on:click="upsert">
+              {{ app.create_mode ? `Create Configuration` : `Enable Configuration` }}
             </el-button>
-            <el-button type="danger">Delete</el-button>
+            <el-button type="danger" v-on:click="deleteConfiguration(settings.name)">Delete</el-button>
           </el-form-item>
         </el-form>
       </div>

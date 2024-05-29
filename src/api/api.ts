@@ -82,4 +82,30 @@ export class Api {
             data: {}
         }).then(response => response.data as ListConfigurationsResponse);
     }
+
+    deleteConfigurations(conf_name: string): Promise<Response> {
+        return http({
+            url: `/p/conf`,
+            method: 'delete',
+            data: {
+                name: conf_name
+            }
+        }).then(response => response.data as Response);
+    }
+
+    createConfiguration(conf: AppConfig): Promise<Response> {
+        return http({
+            url: `/p/create-conf`,
+            method: 'post',
+            data: {"conf":conf,}
+        }).then(response => response.data as Response);
+    }
+
+    enableConfiguration(conf: AppConfig): Promise<Response> {
+        return http({
+            url: `/p/enable-conf`,
+            method: 'post',
+            data: {"conf":conf,}
+        }).then(response => response.data as Response);
+    }
 }
