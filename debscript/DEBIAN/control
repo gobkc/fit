@@ -1,0 +1,8 @@
+Package: fit
+Version: 1.0
+Section: utils
+Priority: optional
+Architecture: all
+Depends: bash
+Maintainer: JianboXiong
+Description: fit is an encrypted notebook program that can back up data to a server or mailbox

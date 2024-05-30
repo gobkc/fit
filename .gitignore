@@ -54,3 +54,4 @@ coverage
 upx-4.2.4-amd64_linux.tar.xz
 fit
 *.tsbuildinfo
+fit-*.deb

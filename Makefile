@@ -11,3 +11,8 @@ doc:
 	go fmt
 	swag fmt
 	swag init
+deb:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-s -w"
+	.bin/upx fit
+	mv fit debscript/usr/bin/fit
+	dpkg-deb --build debscript fit-1.0.0-amd64_linux.deb
