@@ -16,7 +16,8 @@ export interface ListCateResponse {
 }
 
 export interface Note {
-    content: number,
+    cate: string,
+    content: string,
     title: string,
     updated_time: string,
 }

@@ -158,6 +158,11 @@ const upsert = () => {
 <template>
   <el-container>
     <el-header>
+      <el-page-header @back="$router.push('/')" style="display: flex; align-items: center; vertical-align: middle">
+        <template #content>
+          <span class="text-large font-600 mr-3" style="color: white;"> Setting </span>
+        </template>
+      </el-page-header>
     </el-header>
     <el-main>
       <div class="center-container">

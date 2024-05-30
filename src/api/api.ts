@@ -27,7 +27,7 @@ export class Api {
         }).then(response => response.data as ListCateResponse);
     }
 
-    ListNote(keyword: string): Promise<ListNoteResponse> {
+    listNote(keyword: string): Promise<ListNoteResponse> {
         return http({
             url: `/p/list-note?keyword=${keyword}`,
             method: 'get',
@@ -35,7 +35,7 @@ export class Api {
         }).then(response => response.data as ListNoteResponse);
     }
 
-    ListCateNote(cate: string, keyword: string): Promise<ListNoteResponse> {
+    listCateNote(cate: string, keyword: string): Promise<ListNoteResponse> {
         return http({
             url: `/p/${cate}/list-note?keyword=${keyword}`,
             method: 'get',
@@ -43,7 +43,7 @@ export class Api {
         }).then(response => response.data as ListNoteResponse);
     }
 
-    NewCate(cate: string): Promise<Response> {
+    newCate(cate: string): Promise<Response> {
         return http({
             url: `/p/new-cate`,
             method: 'post',
@@ -51,7 +51,23 @@ export class Api {
         }).then(response => response.data as Response);
     }
 
-    NewNote(request: NewNoteRequest): Promise<Response> {
+    deleteCate(cate: string): Promise<Response> {
+        return http({
+            url: `/p/cate`,
+            method: 'delete',
+            data: {cate: cate}
+        }).then(response => response.data as Response);
+    }
+
+    deleteNote(cate: string, title: string): Promise<Response> {
+        return http({
+            url: `/p/note`,
+            method: 'delete',
+            data: {cate: cate, title: title}
+        }).then(response => response.data as Response);
+    }
+
+    newNote(request: NewNoteRequest): Promise<Response> {
         return http({
             url: `/p/new-note`,
             method: 'post',
@@ -59,7 +75,7 @@ export class Api {
         }).then(response => response.data as Response);
     }
 
-    Pull(): Promise<Response> {
+    pull(): Promise<Response> {
         return http({
             url: `/p/pull`,
             method: 'post',
@@ -67,7 +83,7 @@ export class Api {
         }).then(response => response.data as Response);
     }
 
-    Push(): Promise<Response> {
+    push(): Promise<Response> {
         return http({
             url: `/p/push`,
             method: 'post',
@@ -97,7 +113,7 @@ export class Api {
         return http({
             url: `/p/create-conf`,
             method: 'post',
-            data: {"conf":conf,}
+            data: {"conf": conf,}
         }).then(response => response.data as Response);
     }
 
@@ -105,7 +121,7 @@ export class Api {
         return http({
             url: `/p/enable-conf`,
             method: 'post',
-            data: {"conf":conf,}
+            data: {"conf": conf,}
         }).then(response => response.data as Response);
     }
 }

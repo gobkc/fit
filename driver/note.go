@@ -27,6 +27,20 @@ func (n *Note) NewNote(cate, title, content string, upTime ...time.Time) error {
 	return nil
 }
 
+func (n *Note) DeleteCate(cate string) error {
+	conf.IsNotExistCreateCateDir(cate)
+	pathSeparator := string(os.PathSeparator)
+	notePath := fmt.Sprintf("%s%s%s", conf.GetCachePath(), cate, pathSeparator)
+	return os.Remove(notePath)
+}
+
+func (n *Note) DeleteNote(cate, title string) error {
+	conf.IsNotExistCreateCateDir(cate)
+	pathSeparator := string(os.PathSeparator)
+	notePath := fmt.Sprintf("%s%s%s%s.md", conf.GetCachePath(), cate, pathSeparator, title)
+	return os.Remove(notePath)
+}
+
 func (n *Note) ListNotes(cate string) (list []NoteInstance, err error) {
 	pathSeparator := string(os.PathSeparator)
 	dir := conf.GetCachePath()
@@ -39,7 +53,9 @@ func (n *Note) ListNotes(cate string) (list []NoteInstance, err error) {
 			if err == nil {
 				updatedTime = fileInfo.ModTime()
 			}
+			currentCate := strings.TrimSuffix(strings.TrimSuffix(strings.TrimPrefix(fileName, dir), fileInfo.Name()), pathSeparator)
 			list = append(list, NoteInstance{
+				Cate:        currentCate,
 				Title:       strings.TrimSuffix(fileInfo.Name(), `.md`),
 				Content:     string(content),
 				UpdatedTime: updatedTime,
@@ -61,6 +77,7 @@ func (n *Note) ListNotes(cate string) (list []NoteInstance, err error) {
 					updatedTime = fileInfo.ModTime()
 				}
 				list = append(list, NoteInstance{
+					Cate:        cate,
 					Title:       strings.TrimSuffix(file.Name(), `.md`),
 					Content:     string(content),
 					UpdatedTime: updatedTime,

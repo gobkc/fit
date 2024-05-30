@@ -166,6 +166,93 @@ func (s *Server) NewCate(c *gin.Context) {
 	)
 }
 
+type DeleteCateRequest struct {
+	Cate string `json:"cate"`
+}
+
+type DeleteCateResponse struct {
+	Response
+	Parameters DeleteCateRequest `json:"parameters"`
+}
+
+// DeleteCate
+//
+//	@Tags		public apis
+//	@Summary	Delete a cate
+//	@Produce	json
+//	@Param		data	body		DeleteCateRequest	true	"request parameters, must be fill in"
+//	@Success	200		{object}	DeleteCateResponse	"success"
+//	@Failure	401		{object}	string			"Unauthorized"
+//	@Router		/p/cate [delete]
+func (s *Server) DeleteCate(c *gin.Context) {
+	request := DeleteCateRequest{}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusOK, Response{Error: 1, More: err.Error(), Msg: "ParameterError"})
+		return
+	}
+	if err := s.d.DeleteCate(request.Cate); err != nil {
+		s.JSON(c, DeleteCateResponse{
+			Parameters: request,
+			Response: Response{
+				Error: 1,
+				Msg:   "Failed to delete a category",
+				More:  err.Error(),
+			},
+		})
+		return
+	}
+	s.JSON(c, DeleteCateResponse{
+		Parameters: request,
+		Response: Response{
+			Msg: "OK",
+		}},
+	)
+}
+
+type DeleteNoteRequest struct {
+	Cate  string `json:"cate"`
+	Title string `json:"title"`
+}
+
+type DeleteNoteResponse struct {
+	Response
+	Parameters DeleteNoteRequest `json:"parameters"`
+}
+
+// DeleteNote
+//
+//	@Tags		public apis
+//	@Summary	Delete a note
+//	@Produce	json
+//	@Param		data	body		DeleteNoteRequest	true	"request parameters, must be fill in"
+//	@Success	200		{object}	DeleteNoteResponse	"success"
+//	@Failure	401		{object}	string			"Unauthorized"
+//	@Router		/p/note [delete]
+func (s *Server) DeleteNote(c *gin.Context) {
+	request := DeleteNoteRequest{}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusOK, Response{Error: 1, More: err.Error(), Msg: "ParameterError"})
+		return
+	}
+	if err := s.d.DeleteNote(request.Cate, request.Title); err != nil {
+		s.JSON(c, DeleteNoteResponse{
+			Parameters: request,
+			Response: Response{
+				Error: 1,
+				Msg:   "Failed to delete a note",
+				More:  err.Error(),
+			},
+		})
+		return
+	}
+	s.JSON(c, DeleteNoteResponse{
+		Parameters: request,
+		Response: Response{
+			Msg: "OK",
+		}},
+	)
+}
+
 type ListNoteResponse struct {
 	Response
 	Data []driver.NoteInstance `json:"data"`

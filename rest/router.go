@@ -54,6 +54,8 @@ func (s *Server) public() {
 	r.POST(`new-cate`, s.NewCate)
 	r.GET(`/:cate/list-note`, s.ListNote)
 	r.GET(`list-note`, s.ListNote)
+	r.DELETE(`note`, s.DeleteNote)
+	r.DELETE(`cate`, s.DeleteCate)
 	r.POST(`push`, s.Push)
 	r.POST(`pull`, s.Pull)
 	r.GET(`list-conf`, s.ListConf)
