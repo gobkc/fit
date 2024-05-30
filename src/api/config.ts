@@ -7,8 +7,8 @@ import { ElMessage } from 'element-plus';
 const consoleKEY = `console`;
 
 const http: AxiosInstance = axios.create({
-    // baseURL: `/v1/api`,
-    baseURL: "http://localhost:5555/v1/api",
+    baseURL: `/v1/api`,
+    // baseURL: "http://localhost:5555/v1/api",
     timeout: 30000,
     method: 'post',
     headers: { 'Content-Type': 'application/json', Authorization: '' },

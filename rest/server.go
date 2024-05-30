@@ -7,7 +7,9 @@ import (
 	"github.com/gobkc/fit/conf"
 	"github.com/gobkc/fit/driver"
 	"github.com/gobkc/jwt"
+	"log/slog"
 	"net/http"
+	"os/exec"
 	"strings"
 	"time"
 )
@@ -26,6 +28,8 @@ func NewServer() *Server {
 
 	s.Engine = gin.Default()
 	s.LoadRouters()
+
+	go s.OpenBrowser(s.c.RestAddr)
 
 	s.Run(s.c.RestAddr)
 
@@ -66,4 +70,12 @@ func (s *Server) JSONWithHTTPCode(c *gin.Context, httpCode int, data any) {
 	s.JSON(c, data)
 	c.Writer.WriteHeader(httpCode)
 	c.Writer.Status()
+}
+
+func (s *Server) OpenBrowser(addr string) {
+	cmd := exec.Command("google-chrome", fmt.Sprintf(`--app=%s://%s`, `http`, addr))
+	err := cmd.Run()
+	if err != nil {
+		slog.Default().Warn(`failed to open browser`, slog.String(`error`, err.Error()))
+	}
 }

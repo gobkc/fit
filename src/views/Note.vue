@@ -40,8 +40,8 @@ const note = reactive({
   current_cate: ``,
   pull_tips: ``,
   push_tips: ``,
-  categories: [],
-  notes: []
+  categories: [] as string[],
+  notes: [] as Note[]
 })
 
 const {proxy}: any = getCurrentInstance();
@@ -157,7 +157,7 @@ const pull_notes = () => {
   <el-header>
     <div class="header-left-box">
       <div class="logo">
-        <el-image src="/logo.svg" fit="fill"/>
+        <el-image src="/assets/logo.svg" fit="fill"/>
       </div>
       <div class="search-box">
         <el-input
