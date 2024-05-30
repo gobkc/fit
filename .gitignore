@@ -37,6 +37,7 @@ dist
 dist-ssr
 coverage
 *.local
+.bin/
 
 /cypress/videos/
 /cypress/screenshots/
@@ -50,5 +51,6 @@ coverage
 *.njsproj
 *.sln
 *.sw?
-
+upx-4.2.4-amd64_linux.tar.xz
+fit
 *.tsbuildinfo

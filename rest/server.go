@@ -33,6 +33,7 @@ func NewServer() *Server {
 
 	s.Run(s.c.RestAddr)
 
+	time.Sleep(10 * time.Second)
 	return s
 }
 
