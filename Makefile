@@ -15,4 +15,5 @@ deb:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-s -w"
 	.bin/upx fit
 	mv fit debscript/usr/bin/fit
+	cp public/assets/favicon.svg debscript/usr/share/icons/fit.svg
 	dpkg-deb --build debscript fit-1.0.0-amd64_linux.deb

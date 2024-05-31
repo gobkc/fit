@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Fit
+Exec=bash -c "/usr/bin/fit"
+Icon=/usr/share/icons/fit.svg
+Comment=Fit
+Categories=Development;
+Terminal=false

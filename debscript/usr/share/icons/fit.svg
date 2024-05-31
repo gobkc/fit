@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <circle cx="50" cy="50" r="45" fill="#5BC0DE"/>
+  <text x="20" y="68" font-size="55" fill="#FFF" font-family="Arial, sans-serif">F</text>
+  <text x="58" y="60" font-size="25" fill="#FFF" font-family="Arial, sans-serif">I</text>
+  <text x="70" y="60" font-size="25" fill="#FFF" font-family="Arial, sans-serif">T</text>
+</svg>
+
