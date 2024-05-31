@@ -15,3 +15,15 @@
 #### how to create a new note?
 
 ![img.png](create_new_note.png)
+
+### how do I save my note?
+
+enter the `ctrl + s` short key to save the note.
+
+### how to sync notes to email storage?
+
+click the "Push" button to sync the notes.
+
+### how to pull notes from email server?
+
+click the "Pull" button to pull all notes.
