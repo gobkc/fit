@@ -26,4 +26,4 @@ click the "Push" button to sync the notes.
 
 ### how to pull notes from email server?
 
-click the "Pull" button to pull all notes.
+* click the "Pull" button to pull all notes.

@@ -87,6 +87,7 @@ const setting_first_note = () => {
 list_note_titles(note.current_cate, note.keyword)
 
 const select_note = (item: Note) => {
+  note.current_cate = item.cate
   note.title = item.title
   note.content = item.content
   note.update_at = item.updated_time
